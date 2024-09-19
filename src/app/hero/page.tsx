@@ -32,7 +32,7 @@ export default function Dashboard() {
       query.skip(skip);
 
       const result = await query.find({ json: true });
-      console.log(result);
+
       return result as Hero[];
     },
     initialPageParam: 0,

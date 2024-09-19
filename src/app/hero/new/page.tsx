@@ -52,7 +52,6 @@ export default function Dashboard() {
     await myNewObject.save();
 
     router.push("/hero");
-    // console.log(image);
   }
 
   return (

@@ -18,7 +18,5 @@ export const upload_cloudinary = async ({
 
   const data = await response.json();
 
-  console.log(data);
-
   return data as { secure_url: string; width: number; height: number };
 };

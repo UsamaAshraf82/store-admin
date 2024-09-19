@@ -1,7 +1,5 @@
 "use client";
 
-import { FilePond, registerPlugin } from "react-filepond";
-
 import {
   createDefaultImageReader,
   createDefaultImageWriter,
@@ -9,10 +7,9 @@ import {
   openEditor,
   processImage,
 } from "@/modules/pintura/pintura";
-
-import FilePondPluginImageEditor from "@pqina/filepond-plugin-image-editor/dist/FilePondPluginImageEditor";
+import * as FilePondPluginImageEditor from "@pqina/filepond-plugin-image-editor/dist/FilePondPluginImageEditor";
 import FilePondPluginFilePoster from "filepond-plugin-file-poster";
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import { FilePond, registerPlugin } from "react-filepond";
 
 registerPlugin(FilePondPluginImageEditor, FilePondPluginFilePoster);
 
@@ -31,8 +28,6 @@ export default function ImageUpload({
       imageEditorInstantEdit
       imageEditorAllowEdit
       imageEditorAfterWriteImage={(e) => {
-        console.log(e);
-
         if (e.dest) {
           onupdatefiles && onupdatefiles(e.dest as unknown as File);
         }
