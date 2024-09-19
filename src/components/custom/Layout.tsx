@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Home, Package, PanelLeft, Settings, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
@@ -12,9 +11,9 @@ import {
 
 const topmenu = [
   {
-    link: "/",
+    link: "/hero",
     icon: <Home className="h-5 w-5" />,
-    title: "Home",
+    title: "Hero",
   },
   {
     link: "/",
