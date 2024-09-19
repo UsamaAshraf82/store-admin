@@ -7,7 +7,8 @@ import {
   openEditor,
   processImage,
 } from "@/modules/pintura/pintura";
-import * as FilePondPluginImageEditor from "@pqina/filepond-plugin-image-editor/dist/FilePondPluginImageEditor";
+
+import FilePondPluginImageEditor from "@pqina/filepond-plugin-image-editor";
 import FilePondPluginFilePoster from "filepond-plugin-file-poster";
 import { FilePond, registerPlugin } from "react-filepond";
 
