@@ -28,6 +28,8 @@ export default function Dashboard() {
       const skip = pageParam * limit;
 
       const query = new Parse.Query("Hero");
+      query.limit(limit);
+      query.skip(skip);
 
       const result = await query.find({ json: true });
       console.log(result);
