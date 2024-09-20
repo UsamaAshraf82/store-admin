@@ -1,106 +1,106 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { useQueryClient } from "@tanstack/react-query";
+import { createColumnHelper } from "@tanstack/react-table";
 
-import { ColumnDef } from "@tanstack/react-table";
-
-export type DateIso = `${YFirst}${Digit}${Digit}-${MM}-${DD}`;
-
-type YFirst = "19" | "20"; // change this if you accept dates outside of 19xx & 20xx years
-type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-type MM =
-  | "01"
-  | "02"
-  | "03"
-  | "04"
-  | "05"
-  | "06"
-  | "07"
-  | "08"
-  | "09"
-  | "10"
-  | "11"
-  | "12";
-type DD =
-  | "01"
-  | "02"
-  | "03"
-  | "04"
-  | "05"
-  | "06"
-  | "07"
-  | "08"
-  | "09"
-  | "10"
-  | "11"
-  | "12"
-  | "13"
-  | "14"
-  | "15"
-  | "16"
-  | "17"
-  | "18"
-  | "19"
-  | "20"
-  | "21"
-  | "22"
-  | "23"
-  | "24"
-  | "25"
-  | "26"
-  | "27"
-  | "28"
-  | "29"
-  | "30"
-  | "31";
-
+import Parse from "parse";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Hero = {
   active: boolean;
   className: "Hero";
-  createdAt: DateIso;
+  createdAt: string;
   image: string;
   image_mobile: string;
   label: string;
   link: string;
   objectId: string;
-  updatedAt: DateIso;
+  updatedAt: string;
 };
 
-export const columns: ColumnDef<Hero>[] = [
-  {
-    accessorKey: "label",
-    header: "Label",
-  },
-  {
-    accessorKey: "link",
-    header: "Link",
-  },
-  {
-    accessorKey: "image",
-    header: "Image",
-    cell: ({ row }) => {
+const columnHelper = createColumnHelper<Hero>();
+
+export const columns = [
+  columnHelper.accessor("label", {
+    id: "label",
+    header: () => <span>Label</span>,
+  }),
+  columnHelper.accessor("link", {
+    id: "link",
+    header: () => <span>Link</span>,
+  }),
+  columnHelper.accessor("image", {
+    id: "Image",
+    header: () => <span>Link</span>,
+    cell: ({ renderValue }) => {
       return (
         <img
-          src={row.getValue("image")}
+          src={renderValue() || ""}
           alt="image"
           className="max-h-32 object-cover "
         />
       );
     },
-    //   return <img src={row.getValue(")} />
-  },
-  {
-    accessorKey: "image_mobile",
-    header: "Image Mobile",
-    cell: ({ row }) => {
+  }),
+  columnHelper.accessor("image_mobile", {
+    id: "image_mobile",
+    header: () => <span>Image Mobile</span>,
+    cell: ({ renderValue }) => {
       return (
         <img
-          src={row.getValue("image_mobile")}
+          src={renderValue() || ""}
           alt="image"
           className="max-h-32 object-cover "
         />
       );
     },
-  },
+  }),
+  columnHelper.accessor("active", {
+    id: "Active",
+    header: () => <span>Active</span>,
+    cell: ({ renderValue, getValue, row }) => {
+      return (
+        <Switch
+          defaultChecked={renderValue() || false}
+          onCheckedChange={async (e) => {
+            console.log(getValue());
+            const query = new Parse.Query("Hero");
+            try {
+              const object = await query.get(row.original.objectId);
+              object.set("active", e);
+              await object.save();
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+        />
+      );
+    },
+  }),
+  columnHelper.accessor((row) => row, {
+    id: "Actions",
+    header: () => <span>Actions</span>,
+    cell: ({ renderValue, getValue, row }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const queryClient = useQueryClient();
+      return (
+        <Button
+          onClick={async () => {
+            const query = new Parse.Query("Hero");
+            try {
+              const object = await query.get(row.original.objectId);
+              await object.destroy();
+              queryClient.invalidateQueries({ queryKey: ["hero"] });
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+        >
+          Delete
+        </Button>
+      );
+    },
+  }),
 ];

@@ -18,12 +18,13 @@ export default function Dashboard() {
   const {
     data,
     fetchNextPage,
+    refetch,
     // refetch,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["latest-images"],
+    queryKey: ["hero"],
     queryFn: async ({ signal, pageParam }) => {
       const skip = pageParam * limit;
 
