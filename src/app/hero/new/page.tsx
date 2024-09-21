@@ -95,7 +95,7 @@ export default function Dashboard() {
                 <FormControl>
                   <ImageUpload
                     file={field.value}
-                    cropAspect={1120 / 536}
+                    cropAspect={1120 / 400}
                     onupdatefiles={(e) => {
                       // if (e) {
                       form.setValue("image", e);
