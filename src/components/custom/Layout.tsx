@@ -1,4 +1,11 @@
-import { Home, Package, PanelLeft, Settings, ShoppingCart } from "lucide-react";
+import {
+  BookCopy,
+  Home,
+  Package,
+  PanelLeft,
+  Settings,
+  ShoppingCart,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -15,20 +22,27 @@ const topmenu = [
     icon: <Home className="h-5 w-5" />,
     title: "Hero",
   },
+
   {
-    link: "/",
-    icon: <ShoppingCart className="h-5 w-5" />,
-    title: "Orders",
+    link: "/category",
+    icon: <BookCopy className="h-5 w-5" />,
+    title: "Category",
   },
+
   {
     link: "/",
     icon: <Package className="h-5 w-5" />,
     title: "Products",
   },
+  {
+    link: "/",
+    icon: <ShoppingCart className="h-5 w-5" />,
+    title: "Orders",
+  },
 ];
 const bottommenu = [
   {
-    link: "/",
+    link: "/settings",
     icon: <Settings className="h-5 w-5" />,
     title: "Settings",
   },
