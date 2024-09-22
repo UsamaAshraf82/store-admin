@@ -16,7 +16,7 @@ import Parse from "parse";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const SettingSchema = z.object({
+const SettingSchema = z.object({
   Global_Discount: z.number({ coerce: true }).min(0, {
     message: "Label must be Defined.",
   }),
@@ -28,6 +28,7 @@ export default function Dashboard() {
     queryKey: ["hero"],
     queryFn: async () => {
       const constants = await Parse.Config.get();
+
       return constants.attributes;
     },
     initialData: {},
@@ -38,6 +39,7 @@ export default function Dashboard() {
     values: data,
   });
 
+  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SettingSchema>) {
     await saveSettings({
       ...values,
