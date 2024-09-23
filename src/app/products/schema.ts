@@ -1,13 +1,17 @@
 import { DBType } from "@/type/type";
+import { categoryTypeDB } from "../category/schema";
 
-export type categoryType = {
-  label: string;
-  description: string;
-  discount: number;
-  discount_End_Date: string;
-  image_mobile: string;
-  image: string;
+export type productType = {
   active: boolean;
+  category: categoryTypeDB;
+  className: "Product";
+  description: string;
+
+  img: string[];
+  name: string;
+  price: number;
+  quantity: number;
+  sku: string;
 };
 
-export type categoryTypeDB = categoryType & DBType;
+export type productTypeDB = productType & DBType;

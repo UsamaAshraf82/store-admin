@@ -9,7 +9,7 @@ import Parse from "parse";
 import { useEffect } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 import { columns } from "./columns";
-import { categoryTypeDB } from "./schema";
+import { productTypeDB } from "./schema";
 const limit = 50;
 export default function Dashboard() {
   const { isIntersecting, ref } = useIntersectionObserver({
@@ -29,13 +29,17 @@ export default function Dashboard() {
     queryFn: async ({ signal, pageParam }) => {
       const skip = pageParam * limit;
 
-      const query = new Parse.Query("Category");
+      const query = new Parse.Query("Product");
       query.limit(limit);
       query.skip(skip);
 
+      query.include("category");
+
       const result = await query.find({ json: true });
 
-      return result as categoryTypeDB[];
+      console.log(result);
+
+      return result as productTypeDB[];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
@@ -74,7 +78,7 @@ export default function Dashboard() {
   return (
     <main className="grid px-4 gap-2 ">
       <Button asChild className="w-32">
-        <Link href="/category/new">New Category</Link>
+        <Link href="/products/new">New Product</Link>
       </Button>
       <DataTable columns={columns} data={flatten(data?.pages)} />
       {hasNextPage && (

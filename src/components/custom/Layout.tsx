@@ -30,12 +30,12 @@ const topmenu = [
   },
 
   {
-    link: "/",
+    link: "/products",
     icon: <Package className="h-5 w-5" />,
     title: "Products",
   },
   {
-    link: "/",
+    link: "/orders",
     icon: <ShoppingCart className="h-5 w-5" />,
     title: "Orders",
   },
