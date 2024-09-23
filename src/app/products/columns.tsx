@@ -139,11 +139,11 @@ export const columns = [
           </Button>
           <Button
             onClick={async () => {
-              const query = new Parse.Query("Category");
+              const query = new Parse.Query("Product");
               try {
                 const object = await query.get(row.original.objectId);
                 await object.destroy();
-                queryClient.invalidateQueries({ queryKey: ["category"] });
+                queryClient.invalidateQueries({ queryKey: ["product"] });
               } catch (e) {
                 console.log(e);
               }

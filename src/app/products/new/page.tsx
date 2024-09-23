@@ -1,5 +1,6 @@
 "use client";
 
+import { upload_cloudinary } from "@/backend/cloudinary";
 import ImageUploadMultiple from "@/components/custom/image-upload-multiple";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import Parse from "parse";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -35,9 +37,13 @@ const formSchema = z.object({
     message: "Description must be Defined.",
   }),
   sku: z.string(),
+  price: z
+    .number({ coerce: true })
+    .min(1, { message: "Price must be 1 or Greator" }),
+  quantity: z
+    .number({ coerce: true })
+    .min(0, { message: "Price must be 0 or Greator" }),
   discount: z.number({ coerce: true }).nullable(),
-  price: z.number().min(1, { message: "Price must be 1 or Greator" }),
-  quantity: z.number().min(0, { message: "Price must be 0 or Greator" }),
   discount_End_Date: z.string().nullable(),
   img: z.array(z.instanceof(File)),
 });
@@ -54,18 +60,25 @@ export default function Dashboard() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // const image = await upload_cloudinary({ file: values.image });
+    const upload: string[] = [];
+    for (let index = 0; index < values.img.length; index++) {
+      const element = values.img[index];
+      const image = await upload_cloudinary({ file: element });
+      upload.push(image.secure_url);
+    }
     // const image_mobile = await upload_cloudinary({ file: values.mobile_image });
-    // const myNewObject = new Parse.Object("Category");
-    // myNewObject.set("image", image.secure_url);
-    // myNewObject.set("image_mobile", image_mobile.secure_url);
-    // myNewObject.set("label", values.label);
-    // myNewObject.set("description", values.description);
-    // myNewObject.set("discount", parseInt(values.discount + ""));
-    // myNewObject.set("discount_End_Date", values.discount_End_Date);
-    // myNewObject.set("active", true);
-    // await myNewObject.save();
-    router.push("/category");
+    const myNewObject = new Parse.Object("Product");
+    myNewObject.set("img", upload);
+    myNewObject.set("name", values.name);
+    myNewObject.set("description", values.description);
+    myNewObject.set("discount", parseInt(values.discount + ""));
+    myNewObject.set("discount_End_Date", values.discount_End_Date);
+    myNewObject.set("active", true);
+    myNewObject.set("sku", values.sku);
+    myNewObject.set("price", values.price);
+    myNewObject.set("quantity", values.quantity);
+    await myNewObject.save();
+    router.push("/product");
   }
 
   return (
@@ -203,11 +216,8 @@ export default function Dashboard() {
                   <ImageUploadMultiple
                     file={field.value}
                     // cropAspect={1120 / 400}
-                    onupdatefiles={(e: any) => {
-                      console.log(e);
-                      // if (e) {
-                      // form.setValue("img", e);
-                      // }
+                    onupdatefiles={(e) => {
+                      form.setValue("img", e);
                     }}
                   />
                 </FormControl>

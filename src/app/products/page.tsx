@@ -25,7 +25,7 @@ export default function Dashboard() {
     isFetching,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["category"],
+    queryKey: ["product"],
     queryFn: async ({ signal, pageParam }) => {
       const skip = pageParam * limit;
 

@@ -2,7 +2,7 @@
 "use client";
 import usePintura from "@/hooks/usePintura";
 import { Trash } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   OnSelectProps,
   ReactDropzoneVV,
@@ -27,6 +27,10 @@ export default function ImageUploadMultiple({
       url: string;
     }[]
   >([]);
+
+  useEffect(() => {
+    onupdatefiles && onupdatefiles(acceptedFiles.map((i) => i.file));
+  }, [acceptedFiles, onupdatefiles]);
 
   const reactDropzoneVV = useReactDropzoneVV();
 
