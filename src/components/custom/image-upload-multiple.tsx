@@ -2,7 +2,6 @@
 "use client";
 import usePintura from "@/hooks/usePintura";
 import { Trash } from "lucide-react";
-import { useEffect, useState } from "react";
 import {
   OnSelectProps,
   ReactDropzoneVV,
@@ -16,21 +15,29 @@ export default function ImageUploadMultiple({
   onupdatefiles,
 }: {
   cropAspect?: number;
-  file?: File[];
-  onupdatefiles?: (file: File[]) => void;
+  file: {
+    file: File | null;
+    url: string;
+  }[];
+  onupdatefiles?: (
+    file: {
+      file: File | null;
+      url: string;
+    }[]
+  ) => void;
 }) {
   const { pintura } = usePintura();
 
-  const [acceptedFiles, setAcceptedFiles] = useState<
-    {
-      file: File;
-      url: string;
-    }[]
-  >([]);
+  // const [acceptedFiles, setAcceptedFiles] = useState<
+  //   {
+  //     file: File | null;
+  //     url: string;
+  //   }[]
+  // >([]);
 
-  useEffect(() => {
-    onupdatefiles && onupdatefiles(acceptedFiles.map((i) => i.file));
-  }, [acceptedFiles]);
+  // useEffect(() => {
+  //   file && setAcceptedFiles(file);
+  // }, [file]);
 
   const reactDropzoneVV = useReactDropzoneVV();
 
@@ -59,7 +66,11 @@ export default function ImageUploadMultiple({
         url: URL.createObjectURL(ele),
       });
     }
-    setAcceptedFiles((files) => [...files, ...select]);
+
+    // setAcceptedFiles((files) => {
+    onupdatefiles && onupdatefiles([...file, ...select]);
+    // return [...files, ...select];
+    // });
   };
 
   return (
@@ -76,7 +87,7 @@ export default function ImageUploadMultiple({
         </div>
       </ReactDropzoneVV>
       <div className="grid grid-cols-3 gap-2">
-        {acceptedFiles.map((i, k) => (
+        {file.map((i, k) => (
           <div key={i.url} className="bg-black/50 relative">
             <img
               src={i.url}
@@ -87,10 +98,11 @@ export default function ImageUploadMultiple({
               variant={"ghost"}
               className="absolute top-2 right-2 text-white"
               onClick={() => {
-                setAcceptedFiles((files) => {
-                  files.splice(k, 1);
-                  return [...files];
-                });
+                // setAcceptedFiles((files) => {
+                file.splice(k, 1);
+                onupdatefiles && onupdatefiles([...file]);
+                // return [...files];
+                // });
               }}
             >
               <Trash />

@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import Parse from "parse";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { productTypeDB } from "../../schema";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -46,12 +47,30 @@ const formSchema = z.object({
     .min(0, { message: "Price must be 0 or Greator" }),
   discount: z.number({ coerce: true }).nullable(),
   discount_End_Date: z.string().nullable(),
+
   img: z.array(
     z.object({ file: z.instanceof(File).nullable(), url: z.string() })
   ),
 });
 
-export default function Dashboard() {
+export default function Dashboard({
+  params,
+}: {
+  params: { id: string };
+  searchParams: {};
+}) {
+  console.log(params);
+  const { data: product } = useQuery({
+    queryKey: ["product", params.id],
+    queryFn: async ({}) => {
+      const query = new Parse.Query("Product");
+      query.include("category");
+      const result = await query.get(params.id, { json: true });
+
+      return result as productTypeDB;
+    },
+  });
+
   const { data } = useQuery({
     queryKey: ["category"],
     queryFn: async ({}) => {
@@ -68,6 +87,19 @@ export default function Dashboard() {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    values: product
+      ? {
+          name: product.name,
+          description: product.description,
+          sku: product.sku,
+          category: product.category.objectId,
+          price: product.price,
+          quantity: product.quantity,
+          discount: product.discount,
+          discount_End_Date: product.discount_End_Date,
+          img: product.img.map((i) => ({ file: null, url: i })),
+        }
+      : undefined,
     // defaultValues: {
     //   link: "",
     // },
@@ -82,10 +114,14 @@ export default function Dashboard() {
       if (element.file) {
         const image = await upload_cloudinary({ file: element.file });
         upload.push(image.secure_url);
+      } else {
+        upload.push(element.url);
       }
     }
-    // const image_mobile = await upload_cloudinary({ file: values.mobile_image });
-    const myNewObject = new Parse.Object("Product");
+
+    const query = new Parse.Query("Product");
+    const myNewObject = await query.get(params.id);
+
     myNewObject.set("img", upload);
     myNewObject.set("name", values.name);
     myNewObject.set("category", {
@@ -131,10 +167,7 @@ export default function Dashboard() {
             render={({ field }) => (
               <FormItem className="w-1/3">
                 <FormLabel>Category</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a verified email to display" />

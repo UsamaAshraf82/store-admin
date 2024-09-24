@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { useQueryClient } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import Link from "next/link";
 import Parse from "parse";
 import { categoryTypeDB } from "./schema";
 // This type is used to define the shape of our data.
@@ -90,9 +91,8 @@ export const columns = [
       const queryClient = useQueryClient();
       return (
         <div className="flex flex-col gap-2">
-          <Button disabled>
-            Edit
-            {/* <Link href={"/category/edit/" + row.original.objectId}>Edit</Link> */}
+          <Button asChild>
+            <Link href={"/category/edit/" + row.original.objectId}>Edit</Link>
           </Button>
           <Button
             onClick={async () => {

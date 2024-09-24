@@ -12,6 +12,8 @@ export type productType = {
   price: number;
   quantity: number;
   sku: string;
+  discount_End_Date: string;
+  discount: number;
 };
 
 export type productTypeDB = productType & DBType;

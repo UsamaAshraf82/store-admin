@@ -122,22 +122,8 @@ export const columns = [
           >
             <Link href={"#"}>View</Link>
           </Button>
-          <Button
-            // asChild
-            disabled
-            // onClick={async () => {
-            //   const query = new Parse.Query("Category");
-            //   try {
-            //     const object = await query.get(row.original.objectId);
-            //     await object.destroy();
-            //     queryClient.invalidateQueries({ queryKey: ["category"] });
-            //   } catch (e) {
-            //     console.log(e);
-            //   }
-            // }}
-          >
-            Edit
-            {/* <Link href={"/category/edit/" + row.original.objectId}>Edit</Link> */}
+          <Button asChild disabled>
+            <Link href={"/products/edit/" + row.original.objectId}>Edit</Link>
           </Button>
           <Button
             onClick={async () => {
