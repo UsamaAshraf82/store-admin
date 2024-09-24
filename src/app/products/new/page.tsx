@@ -1,6 +1,5 @@
 "use client";
 
-import { upload_cloudinary } from "@/backend/cloudinary";
 import ImageUploadMultiple from "@/components/custom/image-upload-multiple";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,23 +10,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { categoryTypeDB } from "@/app/category/schema";
+import { upload_cloudinary } from "@/backend/cloudinary";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Parse from "parse";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-// category: categoryTypeDB;
-// className: "Product";
-// description: string;
-
-// img: string[];
-// name: string;
-// price: number;
-// quantity: number;
-// sku: string;
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -37,6 +37,7 @@ const formSchema = z.object({
     message: "Description must be Defined.",
   }),
   sku: z.string(),
+  category: z.string(),
   price: z
     .number({ coerce: true })
     .min(1, { message: "Price must be 1 or Greator" }),
@@ -49,6 +50,18 @@ const formSchema = z.object({
 });
 
 export default function Dashboard() {
+  const { data } = useQuery({
+    queryKey: ["category"],
+    queryFn: async ({}) => {
+      const query = new Parse.Query("Category");
+
+      const result = await query.find({ json: true });
+
+      return result as categoryTypeDB[];
+    },
+    initialData: [],
+  });
+
   // 1. Define your form.
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,6 +73,7 @@ export default function Dashboard() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     const upload: string[] = [];
     for (let index = 0; index < values.img.length; index++) {
       const element = values.img[index];
@@ -70,6 +84,11 @@ export default function Dashboard() {
     const myNewObject = new Parse.Object("Product");
     myNewObject.set("img", upload);
     myNewObject.set("name", values.name);
+    myNewObject.set("category", {
+      __type: "Pointer",
+      className: "Category",
+      objectId: values.category,
+    });
     myNewObject.set("description", values.description);
     myNewObject.set("discount", parseInt(values.discount + ""));
     myNewObject.set("discount_End_Date", values.discount_End_Date);
@@ -78,7 +97,7 @@ export default function Dashboard() {
     myNewObject.set("price", values.price);
     myNewObject.set("quantity", values.quantity);
     await myNewObject.save();
-    router.push("/product");
+    router.push("/products");
   }
 
   return (
@@ -97,6 +116,34 @@ export default function Dashboard() {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem className="w-1/3">
+                <FormLabel>Category</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a verified email to display" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {data.map((d) => (
+                      <SelectItem value={d.objectId} key={d.objectId}>
+                        {d.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 <FormMessage />
               </FormItem>

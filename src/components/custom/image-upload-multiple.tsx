@@ -30,7 +30,7 @@ export default function ImageUploadMultiple({
 
   useEffect(() => {
     onupdatefiles && onupdatefiles(acceptedFiles.map((i) => i.file));
-  }, [acceptedFiles, onupdatefiles]);
+  }, [acceptedFiles]);
 
   const reactDropzoneVV = useReactDropzoneVV();
 
