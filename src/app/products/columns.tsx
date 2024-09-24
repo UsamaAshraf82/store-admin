@@ -123,7 +123,8 @@ export const columns = [
             <Link href={"#"}>View</Link>
           </Button>
           <Button
-            asChild
+            // asChild
+            disabled
             // onClick={async () => {
             //   const query = new Parse.Query("Category");
             //   try {
@@ -135,7 +136,8 @@ export const columns = [
             //   }
             // }}
           >
-            <Link href={"/category/edit/" + row.original.objectId}>Edit</Link>
+            Edit
+            {/* <Link href={"/category/edit/" + row.original.objectId}>Edit</Link> */}
           </Button>
           <Button
             onClick={async () => {
