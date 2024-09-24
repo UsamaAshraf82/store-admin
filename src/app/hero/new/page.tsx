@@ -18,8 +18,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  mobile_image: z.instanceof(File),
-  image: z.instanceof(File),
+  mobile_image: z.object({
+    file: z.instanceof(File).nullable(),
+    url: z.string(),
+  }),
+  image: z.object({ file: z.instanceof(File).nullable(), url: z.string() }),
   label: z.string().min(1, {
     message: "Label must be Defined.",
   }),
@@ -40,13 +43,20 @@ export default function Dashboard() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const image = await upload_cloudinary({ file: values.image });
-    const image_mobile = await upload_cloudinary({ file: values.mobile_image });
-
     const myNewObject = new Parse.Object("Hero");
+
+    if (values.image.file) {
+      const image = await upload_cloudinary({ file: values.image.file });
+      myNewObject.set("image", image.secure_url);
+    }
+    if (values.mobile_image.file) {
+      const image_mobile = await upload_cloudinary({
+        file: values.mobile_image.file,
+      });
+      myNewObject.set("image_mobile", image_mobile.secure_url);
+    }
+
     myNewObject.set("link", values.link);
-    myNewObject.set("image", image.secure_url);
-    myNewObject.set("image_mobile", image_mobile.secure_url);
     myNewObject.set("label", values.label);
     myNewObject.set("active", true);
     await myNewObject.save();

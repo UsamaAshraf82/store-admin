@@ -1,17 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
+import usePintura from "@/hooks/usePintura";
 import {
-  createDefaultImageReader,
-  createDefaultImageWriter,
-  getEditorDefaults,
-  openEditor,
-  processImage,
-} from "@/modules/pintura/pintura";
-import FilePondPluginImageEditor from "@pqina/filepond-plugin-image-editor";
-import FilePondPluginFilePoster from "filepond-plugin-file-poster";
-import { FilePond, registerPlugin } from "react-filepond";
-
-registerPlugin(FilePondPluginImageEditor, FilePondPluginFilePoster);
+  OnSelectProps,
+  ReactDropzoneVV,
+  useReactDropzoneVV,
+} from "react-dropzone-vv";
 
 export default function ImageUpload({
   cropAspect,
@@ -19,43 +14,82 @@ export default function ImageUpload({
   onupdatefiles,
 }: {
   cropAspect?: number;
-  file?: File;
-  onupdatefiles?: (file: File) => void;
+  file?: { file: File | null; url: string };
+  onupdatefiles?: (file: { file: File; url: string }) => void;
 }) {
-  return (
-    <FilePond
-      allowImageEditor
-      imageEditorInstantEdit
-      imageEditorAllowEdit
-      imageEditorAfterWriteImage={(e) => {
-        if (e.dest) {
-          onupdatefiles && onupdatefiles(e.dest as unknown as File);
-        }
+  const { pintura } = usePintura();
+  const reactDropzoneVV = useReactDropzoneVV();
 
-        return e.dest;
-      }}
-      imageEditor={{
-        // used to create the editor, receives editor configuration, should return an editor instance
-        createEditor: openEditor,
+  const handleSelect = async ({ acceptedFiles }: OnSelectProps) => {
+    const select: {
+      file: File;
+      url: string;
+    }[] = [];
 
-        // Required, used for reading the image data
-        imageReader: [createDefaultImageReader],
-
-        // optionally. can leave out when not generating a preview thumbnail and/or output image
-        imageWriter: [createDefaultImageWriter],
-        // used to generate poster images, runs an editor in the background
-        imageProcessor: processImage,
-
-        // Pintura Image Editor properties
-        editorOptions: {
-          ...getEditorDefaults({}),
-          imageCropAspectRatio: cropAspect,
+    if (acceptedFiles[0]) {
+      const ele = await pintura({
+        file: acceptedFiles[0],
+        cropAspect: cropAspect,
+        quality: 80,
+        targetSize: {
+          width: 2000,
+          height: 2000,
+          fit: "contain",
+          upscale: false,
         },
-      }}
-      acceptedFileTypes={["images/*"]}
-      // files={file ? [file] : []}
-      name="files" /* sets the file input name, it's filepond by default */
-      labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-    />
+      });
+      onupdatefiles &&
+        onupdatefiles({
+          file: ele,
+          url: URL.createObjectURL(ele),
+        });
+    }
+  };
+
+  return (
+    <>
+      <ReactDropzoneVV
+        reactDropzoneVV={reactDropzoneVV}
+        accept="image/*"
+        onSelect={handleSelect}
+        // onError={handleError}
+      >
+        <div className="p-4 border  border-neutral-800 border-dashed bg-transparent">
+          {file?.url ? (
+            <img
+              src={file?.url}
+              className="max-h-96 object-contain w-full"
+              alt=""
+            />
+          ) : (
+            <p>Drag & drop image</p>
+          )}
+        </div>
+      </ReactDropzoneVV>
+      <div className="grid grid-cols-3 gap-2">
+        {/* {file?.map((i, k) => (
+          <div key={i.url} className="bg-black/50 relative">
+            <img
+              src={i.url}
+              className="max-h-96 object-contain w-full"
+              alt=""
+            />
+            <Button
+              variant={"ghost"}
+              className="absolute top-2 right-2 text-white"
+              onClick={() => {
+                // setAcceptedFiles((files) => {
+                file.splice(k, 1);
+                onupdatefiles && onupdatefiles([...file]);
+                // return [...files];
+                // });
+              }}
+            >
+              <Trash />
+            </Button>
+          </div>
+        ))} */}
+      </div>
+    </>
   );
 }

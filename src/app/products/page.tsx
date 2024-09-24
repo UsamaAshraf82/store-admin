@@ -10,49 +10,43 @@ import { useEffect } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 import { columns } from "./columns";
 import { productTypeDB } from "./schema";
+
 const limit = 50;
 export default function Dashboard() {
   const { isIntersecting, ref } = useIntersectionObserver({
     threshold: 0.5,
   });
 
-  const {
-    data,
-    fetchNextPage,
-    refetch,
-    // refetch,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["product"],
-    queryFn: async ({ signal, pageParam }) => {
-      const skip = pageParam * limit;
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["product"],
+      queryFn: async ({ signal, pageParam }) => {
+        const skip = pageParam * limit;
 
-      const query = new Parse.Query("Product");
-      query.limit(limit);
-      query.skip(skip);
+        const query = new Parse.Query("Product");
+        query.limit(limit);
+        query.skip(skip);
 
-      query.include("category");
+        query.include("category");
 
-      const result = await query.find({ json: true });
+        const result = await query.find({ json: true });
 
-      console.log(result);
+        console.log(result);
 
-      return result as productTypeDB[];
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      if (lastPage.length < limit) {
-        return undefined;
-      }
+        return result as productTypeDB[];
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, allPages, lastPageParam) => {
+        if (lastPage.length < limit) {
+          return undefined;
+        }
 
-      if (lastPageParam >= 10) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    },
-  });
+        if (lastPageParam >= 10) {
+          return undefined;
+        }
+        return lastPageParam + 1;
+      },
+    });
 
   useEffect(() => {
     if (isFetching) {

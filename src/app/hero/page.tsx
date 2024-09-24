@@ -9,6 +9,7 @@ import Parse from "parse";
 import { useEffect } from "react";
 import { useIntersectionObserver } from "usehooks-ts";
 import { columns, Hero } from "./columns";
+
 const limit = 50;
 export default function Dashboard() {
   const { isIntersecting, ref } = useIntersectionObserver({

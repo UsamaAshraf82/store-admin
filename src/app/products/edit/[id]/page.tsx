@@ -1,5 +1,7 @@
 "use client";
 
+import { categoryTypeDB } from "@/app/category/schema";
+import { upload_cloudinary } from "@/backend/cloudinary";
 import ImageUploadMultiple from "@/components/custom/image-upload-multiple";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,10 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { categoryTypeDB } from "@/app/category/schema";
-import { upload_cloudinary } from "@/backend/cloudinary";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
@@ -59,7 +58,6 @@ export default function Dashboard({
   params: { id: string };
   searchParams: {};
 }) {
-  console.log(params);
   const { data: product } = useQuery({
     queryKey: ["product", params.id],
     queryFn: async ({}) => {

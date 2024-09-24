@@ -6,6 +6,7 @@ import Link from "next/link";
 import Parse from "parse";
 import { columns } from "./columns";
 import { categoryTypeDB } from "./schema";
+
 export default function Dashboard() {
   const { data } = useQuery({
     queryKey: ["category"],

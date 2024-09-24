@@ -13,10 +13,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Parse from "parse";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { categoryTypeDB } from "../../schema";
 
 const formSchema = z.object({
   label: z.string().min(1, {
@@ -34,11 +36,37 @@ const formSchema = z.object({
   image: z.object({ file: z.instanceof(File).nullable(), url: z.string() }),
 });
 
-export default function Dashboard() {
+export default function Dashboard({
+  params,
+}: {
+  params: { id: string };
+  searchParams: {};
+}) {
+  const { data: category } = useQuery({
+    queryKey: ["category", params.id],
+    queryFn: async ({}) => {
+      const query = new Parse.Query("Category");
+
+      const result = await query.get(params.id, { json: true });
+
+      return result as categoryTypeDB;
+    },
+  });
+
   // 1. Define your form.
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    values: category
+      ? {
+          label: category.label,
+          description: category.description,
+          discount: category.discount,
+          discount_End_Date: category.discount_End_Date,
+          mobile_image: { file: null, url: category.image_mobile },
+          image: { file: null, url: category.image },
+        }
+      : undefined,
     // defaultValues: {
     //   link: "",
     // },
@@ -46,7 +74,9 @@ export default function Dashboard() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const myNewObject = new Parse.Object("Category");
+    const query = new Parse.Query("Category");
+    const myNewObject = await query.get(params.id);
+
     if (values.image.file) {
       const image = await upload_cloudinary({ file: values.image.file });
       myNewObject.set("image", image.secure_url);
