@@ -15,7 +15,7 @@ export default function ImageUploadMultiple({
   onupdatefiles,
 }: {
   cropAspect?: number;
-  file: {
+  file?: {
     file: File | null;
     url: string;
   }[];
@@ -68,7 +68,7 @@ export default function ImageUploadMultiple({
     }
 
     // setAcceptedFiles((files) => {
-    onupdatefiles && onupdatefiles([...file, ...select]);
+    onupdatefiles && onupdatefiles([...(file ? file : []), ...select]);
     // return [...files, ...select];
     // });
   };
@@ -87,7 +87,7 @@ export default function ImageUploadMultiple({
         </div>
       </ReactDropzoneVV>
       <div className="grid grid-cols-3 gap-2">
-        {file.map((i, k) => (
+        {file?.map((i, k) => (
           <div key={i.url} className="bg-black/50 relative">
             <img
               src={i.url}
